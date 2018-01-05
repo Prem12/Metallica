@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<script src="redux.js"></script>
+	<script>
+		
+		var bugActionCreators = {
+			addNew : function(bugName){
+				let newBug = { name : bugName, isClosed : false, createdAt : new Date()};
+				return { type : 'ADD_NEW', payload : newBug};
+			},
+			toggle : function(bugToToggle){
+				let toggledBug = {...bugToToggle, isClosed : !bugToToggle.isClosed};
+				//let payload = { bugToToggle : bugToToggle, toggledBug : toggledBug};
+				let payload = { bugToToggle, toggledBug };
+				return { type : 'TOGGLE', payload : payload };
+			},
+			removeClosed : function(){
+				return { type : 'REMOVE_CLOSED'};
+			}
+		}
+		
+
+
+		function bugsReducer(currentState = [], action){
+			if (action.type === 'ADD_NEW'){
+				return [...currentState, action.payload];
+			}
+			if (action.type === 'TOGGLE'){
+				let { bugToToggle, toggledBug } = action.payload;
+				return currentState.map(bug => bug === bugToToggle ? toggledBug : bug);
+			}
+			if (action.type === 'REMOVE_CLOSED'){
+				return currentState.filter(bug => !bug.isClosed);
+			}
+			return currentState;
+		}
+
+		window.store = Redux.createStore(bugsReducer);
+
+		let bugActions = Redux.bindActionCreators(bugActionCreators, store.dispatch);
+
+		store.subscribe(() => console.table(store.getState()));
+	</script>
+</head>
+<body>
+	
+</body>
+</html>

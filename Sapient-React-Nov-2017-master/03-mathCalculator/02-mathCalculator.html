@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Math Calculator</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		class MathCalculator extends React.Component{
+			state = {
+				n1 : 0,
+				n2 : 0,
+				result : 0
+			};
+			constructor(){
+				super();
+				this.onNumber1Change = this.onNumber1Change.bind(this);
+				this.onNumber2Change = this.onNumber2Change.bind(this);
+				this.onAddClick = this.onAddClick.bind(this);
+				this.onSubtractClick = this.onSubtractClick.bind(this);
+				this.onMultiplyClick = this.onMultiplyClick.bind(this);
+				this.onDivideClick = this.onDivideClick.bind(this);
+			}
+			onNumber1Change(){
+				let n1 = parseInt(this.refs.txtNumber1.value);
+				this.setState({n1 : n1});
+			}
+			onNumber2Change(){
+				let n2 = parseInt(this.refs.txtNumber2.value);
+				this.setState({n2 : n2});
+			}
+			onAddClick(){
+				let n1 = this.state.n1,
+					n2 = this.state.n2,
+					result = n1 + n2;
+					this.setState({result : result});			
+			}
+			onSubtractClick(){
+				let n1 = this.state.n1,
+					n2 = this.state.n2,
+					result = n1 - n2;
+					this.setState({result : result});
+			}
+			onMultiplyClick(){
+				let n1 = this.state.n1,
+					n2 = this.state.n2,
+					result = n1 * n2;
+					this.setState({result : result});
+			}
+			onDivideClick(){
+				let n1 = this.state.n1,
+					n2 = this.state.n2,
+					result = n1 / n2;
+					this.setState({result : result});
+			}
+			render(){
+				return(
+					<div>	
+						<h1>Math Calculator</h1>
+						<hr />
+						<input type="number" ref="txtNumber1" onChange={this.onNumber1Change}/>
+						<input type="number" ref="txtNumber2" onChange={this.onNumber2Change}/>
+						<input type="button" value="Add" onClick={this.onAddClick}/>
+						<input type="button" value="Subtract" onClick={this.onSubtractClick}/>
+						<input type="button" value="Multiply" onClick={this.onMultiplyClick}/>
+						<input type="button" value="Divide" onClick={this.onDivideClick}/>
+						<div>{this.state.result}</div>
+					</div>
+				)
+			}
+		}
+		ReactDOM.render(<MathCalculator/>, document.getElementById('content'));
+	</script>
+</head>
+<body>
+
+	<div id="content"></div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Spinner</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="stateManager.js"></script>
+	<script type="text/babel">
+		function spinnerReducer(currentState = 0, action){
+			if (action.type === 'INCREMENT')
+				return currentState += action.payload;
+			if (action.type === 'DECREMENT')
+				return currentState -= action.payload;
+			return currentState;
+		}
+		let store = SM.createStore(spinnerReducer);
+
+		
+
+		class Spinner extends React.Component{
+			onDecrementClick(){
+				let { decrement } = this.props,
+					no = parseInt(this.refs.txtNumber.value);
+				decrement(no);
+			}
+			onIncrementClick(){
+				let { increment } = this.props,
+					no = parseInt(this.refs.txtNumber.value);
+				increment(no);
+			}
+			render() {
+				let {value} = this.props;
+				return (
+					<div>
+						<input type="number" ref="txtNumber" />
+						<input type="button" value="Decrement" onClick={this.onDecrementClick.bind(this)} />
+						<input type="button" value="Increment" onClick={this.onIncrementClick.bind(this)} />
+						<div> [ {value} ] </div>
+					</div>
+				);
+			}
+		}
+
+		function bindIncrementAction(dispatch){
+			return function get_increment_action(data){
+				dispatch({ type : 'INCREMENT', payload : data });
+			}
+		}
+		function bindDecrementAction(dispatch){
+			return function get_decrement_action(data){
+				dispatch({ type : 'DECREMENT', payload : data });
+			}
+		}
+			
+		let increment_action = bindIncrementAction(store.dispatch);
+		let decrement_action = bindDecrementAction(store.dispatch);
+
+		function renderApp(){
+			let value = store.getState();
+			ReactDOM.render(<Spinner 
+				value = {value} 
+				increment={increment_action} 
+				decrement={decrement_action}/>, document.getElementById('content'));
+		}
+		store.subscribe(renderApp);
+		renderApp();
+	</script>
+</head>
+<body>
+	<div id="content"></div>
+</body>
+</html>

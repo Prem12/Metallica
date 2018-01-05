@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Product Listing</title>
+	
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="stateManager.js"></script>
+	<script type="text/babel">
+
+		function productsReducer(currentState = [], action){
+			if (action.type === 'ADD_NEW'){
+				/*return [...currentState, action.payload];*/
+				currentState.push(action.payload);
+			}
+			return currentState;
+		}
+
+		function bindNewProductAction(dispatch){
+			return function(newProductName){
+				dispatch({ type : 'ADD_NEW', payload : newProductName});
+			}
+		}
+
+		window.store = SM.createStore(productsReducer);
+
+		let newProductAction = bindNewProductAction(store.dispatch);
+		
+		let ProductItem = ({product}) => (
+			<li>{product}</li>
+		)
+
+		class ProductList extends React.Component{
+			onCreateNewClick(){
+				let productName = this.refs.txtProductName.value;
+				this.props.newProduct(productName);
+			}
+			render() {
+				let { products } = this.props,
+					items = products.map((product, index) => (<ProductItem product={product} key={index} />));
+
+				return (
+					<div>
+						<label>Product Name :</label>
+						<input type="text" ref="txtProductName" />
+						<input type="button" value="Create New" onClick={this.onCreateNewClick.bind(this)} />
+						<ol>
+							{items}
+						</ol>
+					</div>
+				)
+			}
+		}
+		
+		function renderApp(){
+			let products = store.getState();
+			ReactDOM.render(<ProductList products={products} newProduct={newProductAction}/>, 
+				document.getElementById('content'));
+		}
+		store.subscribe(renderApp);
+		renderApp();
+	</script>
+</head>
+<body>
+
+	<div id="content"></div>
+</body>
+</html>

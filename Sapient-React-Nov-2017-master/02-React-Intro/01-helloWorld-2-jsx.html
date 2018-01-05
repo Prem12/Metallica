@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>React Intro</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		class HelloWorld extends React.Component{
+			render(){
+				return (
+					<div>
+						<h1>Heading - 1'</h1>
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur a libero unde quisquam ratione natus itaque error, sunt quae eaque vitae sit maxime, tempore eum quod consequatur, aperiam nihil iure.</p>
+						<ol>
+							<li>something</li>
+						</ol>
+					</div>
+				);
+			}
+		}
+		
+		var btnRender = document.getElementById('btnRender');
+		btnRender.addEventListener('click', btnRenderClick);
+		
+		function btnRenderClick(){
+			ReactDOM.render(<HelloWorld />, document.getElementById('content'));
+		}
+	</script>
+</head>
+<body>
+	<input type="button" value="Render" id="btnRender">
+	<div id="content"></div>
+</body>
+</html>

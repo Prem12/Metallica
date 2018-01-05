@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Math Calculator</title>
+	<style>
+		.result{
+			font-size: 22pt;
+		}
+		.positive{
+			color : green;
+		}
+		.negative{
+			color : red;
+		}
+	</style>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		class EventEmitter{
+			constructor(){
+				this.__subscriptions = [];
+			}
+			subscribe(fn){
+				this.__subscriptions.push(fn);
+			}
+			trigger(){
+				this.__subscriptions.forEach(fn => fn());
+			}
+		}
+
+		class MathCalculatorModel extends EventEmitter{
+			constructor(){
+				super();
+				this.n1 = 0;
+				this.n2 = 0;
+				this.result = 0;
+			}
+			add(){
+				this.result = this.n1 + this.n2;
+				this.trigger();
+			}
+			subtract(){
+				this.result = this.n1 - this.n2;
+				this.trigger();
+			}
+			multiply(){
+				this.result = this.n1 * this.n2;
+				this.trigger();
+			}
+			divide(){
+				this.result = this.n1 / this.n2;
+				this.trigger();
+			}
+		}
+		
+		let MathCalculator = ({ model }) => (
+			<div>	
+				<h1>Math Calculator</h1>
+				<hr />
+				<input type="number" onChange={(evt) => { model.n1 = parseInt(evt.target.value)} }/>
+				<input type="number" onChange={(evt) => { model.n2 = parseInt(evt.target.value)}}/>
+				<input type="button" value="Add" onClick={() => model.add()}/>
+				<input type="button" value="Subtract" onClick={() => model.subtract()}/>
+				<input type="button" value="Multiply" onClick={() => model.multiply()}/>
+				<input type="button" value="Divide" onClick={() => model.divide()}/>
+				<MathCalculatorResult value={model.result} />
+			</div>
+		);
+
+		let MathCalculatorResult = ({value}) => {
+			let cssStyles = 'result ' + (value >= 0 ? 'positive' : 'negative');
+			return (
+				<div className={cssStyles}>{value}</div>
+			);
+		};
+			
+		window.model = new MathCalculatorModel();
+		function renderApp(){
+			ReactDOM.render(<MathCalculator model={model}/>, document.getElementById('content'));	
+		}
+		model.subscribe(renderApp);
+		renderApp();
+	</script>
+</head>
+<body>
+
+	<div id="content"></div>
+</body>
+</html>

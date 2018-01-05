@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Spinner</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="stateManager.js"></script>
+	<script type="text/babel">
+		function spinnerReducer(currentState = 0, action){
+			if (action.type === 'INCREMENT')
+				return ++currentState;
+			if (action.type === 'DECREMENT')
+				return --currentState;
+			return currentState;
+		}
+		let store = SM.createStore(spinnerReducer);
+
+		function get_increment_action(){
+			return { type : 'INCREMENT' }
+		}
+		function get_decrement_action(){
+			return { type : 'DECREMENT' }
+		}
+
+		class Spinner extends React.Component{
+			constructor(){
+				super();
+				this.onIncrementClick = this.onIncrementClick.bind(this);
+				this.onDecrementClick = this.onDecrementClick.bind(this);
+			}
+			onIncrementClick(){
+				let inc_action = this.props.increment_action();
+				this.props.store.dispatch(inc_action);
+			}
+			onDecrementClick(){
+				let dec_action = this.props.decrement_action();
+				this.props.store.dispatch(dec_action);
+			}
+			render(){
+				let value = this.props.store.getState();
+				return (
+					<div>
+						<input type="button" value="Decrement" onClick={this.onDecrementClick} />
+						<span> [ {value} ] </span>
+						<input type="button" value="Increment" onClick={this.onIncrementClick} />
+					</div>
+				)
+			}
+		}
+
+		function renderApp(){
+			ReactDOM.render(<Spinner 
+				store={store} 
+				increment_action={get_increment_action} 
+				decrement_action={get_decrement_action}/>, document.getElementById('content'));
+		}
+		store.subscribe(renderApp);
+		renderApp();
+	</script>
+</head>
+<body>
+	<div id="content"></div>
+</body>
+</html>

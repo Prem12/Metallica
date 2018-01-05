@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>React Intro</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		class Greeter extends React.Component{
+			render(){
+				let greetMsg = `Hello ${this.props.name}, Welcome to React.js!`
+				return <h1>{greetMsg}</h1>;
+			}
+		}
+
+		var btnGreet = document.getElementById('btnGreet');
+		btnGreet.addEventListener('click', btnGreetClick);
+	
+		function btnGreetClick(){
+			let userName = prompt('Enter the username : ');
+			ReactDOM.render(
+				<Greeter name={userName}></Greeter>, 
+				document.getElementById('content')
+			);
+		}
+	</script>
+</head>
+<body>
+	<input type="button" value="Greet" id="btnGreet">
+	<div id="content"></div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>React Intro</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		class Greeter extends React.Component{
+			state = {
+				name : ''
+			}
+
+			constructor(){
+				super();
+				this.onBtnGreetClick = this.onBtnGreetClick.bind(this);
+			}
+			onBtnGreetClick(){
+				let userName = this.refs.txtUserName.value;
+				this.setState({name : userName})
+			}
+			render(){
+				let greetMsg = `Hello ${this.state.name}, Welcome to React.js!`;
+				let greetElement = this.state.name === '' ? null : <h1>{greetMsg}</h1>;
+				return (
+					<div>
+						<label>User Name :</label>
+						<input type="text" ref="txtUserName" />
+						<input type="button" value="Greet" onClick={this.onBtnGreetClick} />
+						{greetElement}
+					</div>
+				);
+			}
+		}
+
+		ReactDOM.render(
+			<Greeter></Greeter>, 
+			document.getElementById('content')
+		);
+	
+	</script>
+</head>
+<body>
+	
+	<div id="content"></div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Math Calculator</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		class EventEmitter{
+			constructor(){
+				this.__subscriptions = [];
+			}
+			subscribe(fn){
+				this.__subscriptions.push(fn);
+			}
+			trigger(){
+				this.__subscriptions.forEach(fn => fn());
+			}
+		}
+
+		class MathCalculatorModel extends EventEmitter{
+			constructor(){
+				super();
+				this.n1 = 0;
+				this.n2 = 0;
+				this.result = 0;
+			}
+			add(){
+				this.result = this.n1 + this.n2;
+				this.trigger();
+			}
+			subtract(){
+				this.result = this.n1 - this.n2;
+				this.trigger();
+			}
+			multiply(){
+				this.result = this.n1 * this.n2;
+				this.trigger();
+			}
+			divide(){
+				this.result = this.n1 / this.n2;
+				this.trigger();
+			}
+		}
+		class MathCalculator extends React.Component{
+			constructor(){
+				super();
+				this.onNumber1Change = this.onNumber1Change.bind(this);
+				this.onNumber2Change = this.onNumber2Change.bind(this);
+				this.onAddClick = this.onAddClick.bind(this);
+				this.onSubtractClick = this.onSubtractClick.bind(this);
+				this.onMultiplyClick = this.onMultiplyClick.bind(this);
+				this.onDivideClick = this.onDivideClick.bind(this);
+			}
+			onNumber1Change(evt){
+				this.props.model.n1 = parseInt(evt.target.value);
+			}
+			onNumber2Change(evt){
+				this.props.model.n2 = parseInt(evt.target.value);
+			}
+			onAddClick(){
+				this.props.model.add();
+			}
+			onSubtractClick(){
+				this.props.model.subtract()
+			}
+			onMultiplyClick(){
+				this.props.model.multiply()
+			}
+			onDivideClick(){
+				this.props.model.divide()
+			}
+			render(){
+				return(
+					<div>	
+						<h1>Math Calculator</h1>
+						<hr />
+						<input type="number" onChange={this.onNumber1Change}/>
+						<input type="number" onChange={this.onNumber2Change}/>
+						<input type="button" value="Add" onClick={this.onAddClick}/>
+						<input type="button" value="Subtract" onClick={this.onSubtractClick}/>
+						<input type="button" value="Multiply" onClick={this.onMultiplyClick}/>
+						<input type="button" value="Divide" onClick={this.onDivideClick}/>
+						<div>{this.props.model.result}</div>
+					</div>
+				)
+			}
+		}
+		window.model = new MathCalculatorModel();
+		function renderApp(){
+			ReactDOM.render(<MathCalculator model={model}/>, document.getElementById('content'));	
+		}
+		model.subscribe(renderApp);
+		renderApp();
+	</script>
+</head>
+<body>
+
+	<div id="content"></div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Math Calculator</title>
+	
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		class EventEmitter{
+			constructor(){
+				this.__subscriptions = [];
+			}
+			subscribe(fn){
+				this.__subscriptions.push(fn);
+			}
+			trigger(){
+				this.__subscriptions.forEach(fn => fn());
+			}
+		}
+		class ProductListModel extends EventEmitter{
+			constructor(){
+				super();
+				this.list = [];
+				super();
+			}
+			add(productName){
+				this.list.push(productName);
+				this.trigger();
+			}
+		}
+		let ProductItem = ({product}) => (
+			<li>{product}</li>
+		)
+
+		class ProductList extends React.Component{
+			onCreateNewClick(){
+				let productName = this.refs.txtProductName.value;
+				this.props.products.add(productName);
+			}
+			render() {
+				let products = this.props.products.list,
+					items = products.map((product, index) => (<ProductItem product={product} key={index} />));
+
+				return (
+					<div>
+						<label>Product Name :</label>
+						<input type="text" ref="txtProductName" />
+						<input type="button" value="Create New" onClick={this.onCreateNewClick.bind(this)} />
+						<ol>
+							{items}
+						</ol>
+					</div>
+				)
+			}
+		}
+		let products = new ProductListModel();
+		function renderApp(){
+			ReactDOM.render(<ProductList products={products}/>, 
+				document.getElementById('content'));
+		}
+		products.subscribe(renderApp);
+		renderApp();
+	</script>
+</head>
+<body>
+
+	<div id="content"></div>
+</body>
+</html>

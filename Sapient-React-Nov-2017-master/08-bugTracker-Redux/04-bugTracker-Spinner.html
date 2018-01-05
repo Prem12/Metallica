@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		body{
+			margin-left: 50px;
+		}
+		section{
+			margin-bottom: 10px;
+		}
+		.closed{
+			color : red;
+			text-decoration: line-through;
+			font-style: italic;
+			font-weight: bold;
+		}
+		.bugname, .stats{
+			font-size: 22pt;
+		}
+		.bugname{
+			cursor : pointer;
+		}
+		ol{
+			width: 500px;
+			list-style: none;
+			-webkit-padding-start : 0px;
+			-moz-padding-start : 0px;
+		}
+		li{
+			margin-bottom: 10px;
+			padding: 5px;
+			border-radius: 5px;
+			border: 1px solid gray;
+			background-color: #e7e7e7;
+		}
+		.datetime{
+			font-style: italic;
+		}
+	</style>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="redux.js"></script>
+	<script src="react-redux.js"></script>
+	<script type="text/babel">
+		
+		//action creators
+		var bugActionCreators = {
+			addNew : function(bugName){
+				let newBug = { name : bugName, isClosed : false, createdAt : new Date()};
+				return { type : 'ADD_NEW', payload : newBug};
+			},
+			toggle : function(bugToToggle){
+				let toggledBug = {...bugToToggle, isClosed : !bugToToggle.isClosed};
+				//let payload = { bugToToggle : bugToToggle, toggledBug : toggledBug};
+				let payload = { bugToToggle, toggledBug };
+				return { type : 'TOGGLE', payload : payload };
+			},
+			removeClosed : function(){
+				return { type : 'REMOVE_CLOSED'};
+			}
+		}
+		
+		let spinnerActionCreators = {
+			increment : function (){
+				return { type : 'INCREMENT' };
+			},
+			decrement : function(){
+				return { type : 'DECREMENT' };
+			}
+		}
+
+		//reducers
+		function bugsReducer(currentState = [], action){
+			if (action.type === 'ADD_NEW'){
+				return [...currentState, action.payload];
+			}
+			if (action.type === 'TOGGLE'){
+				let { bugToToggle, toggledBug } = action.payload;
+				return currentState.map(bug => bug === bugToToggle ? toggledBug : bug);
+			}
+			if (action.type === 'REMOVE_CLOSED'){
+				return currentState.filter(bug => !bug.isClosed);
+			}
+			return currentState;
+		}
+
+		function spinnerReducer(currentState = 0, action){
+			if (action.type === 'INCREMENT')
+				return ++currentState;
+			if (action.type === 'DECREMENT')
+				return --currentState;
+			return currentState;
+		}
+
+
+		let combinedReducers = Redux.combineReducers({
+			bugState : bugsReducer,
+			spinnerState : spinnerReducer
+		});
+
+		window.store = Redux.createStore(combinedReducers);
+
+		
+
+		class BugEdit extends React.Component{
+			constructor(){
+				super();
+				this.onAddNewClick = this.onAddNewClick.bind(this);
+			}
+			onAddNewClick(){
+				let bugName = this.refs.txtBugName.value;
+				this.props.addNew(bugName);
+			}
+			render(){
+				return(
+					<section className="edit">
+						<label htmlFor="">Bug Name :</label>
+						<input type="text" ref="txtBugName"/>
+						<input type="button" value="Create New" onClick={this.onAddNewClick} />
+					</section>
+				)
+			}
+		}
+
+		class BugItem extends React.Component{
+			onBugNameClick(){
+				let {bug} = this.props;
+				this.props.toggle(bug);
+			}
+			render(){
+				let {bug} = this.props;
+				return(
+					<li>
+						<span className="bugname" onClick={this.onBugNameClick.bind(this)}>{bug.name}</span>
+						<div className="datetime">[{bug.createdAt.toString()}]</div>
+						<div>[{bug.isClosed.toString()}]</div>
+					</li>
+				)
+			}
+		}
+		
+		class BugTracker extends React.Component{
+			render(){
+				console.log(this.props);
+				let list = this.props.bugs;
+				let {addNew, toggle, removeClosed } = this.props;
+				let bugItems = list.map((bug, index) => (
+					<BugItem bug={bug} key={index} toggle={toggle}/>
+				));
+
+				return (
+					<div>
+						<section className="stats">
+							<span className="closed">1</span>
+							<span> / </span>
+							<span>{list.length}</span>
+						</section>
+						<section className="sort">
+							<label htmlFor="">Order By :</label>
+							<select>
+								<option value=""></option>
+								<option value=""></option>
+							</select>
+							<label htmlFor="">Descending ? :</label>
+							<input type="checkbox" />
+						</section>
+						<BugEdit addNew={addNew}></BugEdit>
+						<section className="list">
+							<ol>
+								{bugItems}
+							</ol>
+							<input type="button" value="Remove Closed" onClick={removeClosed} />
+						</section>
+					</div>
+				)
+			}
+		}
+		
+		let ConnectedBugTracker = ReactRedux.connect(function mapStateToProps(state){
+			//extract whatever is needed from the state for the component and return
+			return { bugs : state.bugState } ;
+		}, function mapDispatchToProps(dispatch){
+			let bugActions = Redux.bindActionCreators(bugActionCreators, dispatch);
+			return bugActions;
+		})(BugTracker);
+
+
+		let Spinner = ({value, increment, decrement}) => (
+			<div>
+				<input type="button" value="Decrement" onClick={decrement} />
+				<span> [ {value} ] </span>
+				<input type="button" value="Increment" onClick={increment} />
+			</div>
+		);
+
+		let ConnectedSpinner = ReactRedux.connect(
+			(state) => ({value : state.spinnerState}),
+			(dispatch) => Redux.bindActionCreators(spinnerActionCreators, dispatch)
+		)(Spinner);
+
+		ReactDOM.render(
+			<ReactRedux.Provider store={store}>
+				<div>
+					<ConnectedSpinner></ConnectedSpinner>
+					<hr/>
+					<ConnectedBugTracker></ConnectedBugTracker>
+				</div>
+			</ReactRedux.Provider>, 
+		document.getElementById('content'));
+	</script>
+</head>
+<body>
+	<div id="content"></div>
+</body>
+</html>
